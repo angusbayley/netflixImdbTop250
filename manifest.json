@@ -1,8 +1,8 @@
 
 {
-  "name": "Page action by URL",
+  "name": "Netflix IMDB top 250",
   "version": "1.0",
-  "description": "Shows a page action for urls which have the letter 'g' in them.",
+  "description": "Removes all movies that aren't in the IMDB top 250 from Netflix.",
   "background": {
     "scripts": ["background.js"],
     "persistent": false
@@ -10,7 +10,7 @@
   "page_action" :
 	  {
 	    "default_icon" : "icon.png",
-	    "default_title" : "There's a 'G' in this URL!",
+	    "default_title" : "Cull all movies not in the IMDB top 250!",
 	    "default_popup": "popup.html"
 	  },
 	  "permissions" : [
