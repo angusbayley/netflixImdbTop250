@@ -14,7 +14,8 @@
 	    "default_popup": "popup.html"
 	  },
 	  "permissions" : [
-	    "declarativeContent"
+	    "declarativeContent",
+	    "http://www.imdb.com/*"
 	  ],
 	  "icons" : {
 	    "48" : "icon.png",
