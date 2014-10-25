@@ -20,3 +20,10 @@ chrome.runtime.onInstalled.addListener(function() {
     ]);
   });
 });
+
+//console.log("backgound.js checking in");
+
+chrome.pageAction.onClicked.addListener(function() {
+  console.log("clicked!");
+  chrome.tabs.executeScript({file: "contentScript.js"});
+});
