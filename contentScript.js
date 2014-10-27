@@ -18,7 +18,6 @@ function displayResponse(e) {
   titleColumnText = 'class="titleColumn"';
   i = 1;
   findNextTitle(responseText);
-  console.log("top 250 after recursion: " + top250);
   purge();
 }
 
@@ -31,7 +30,6 @@ function findNextTitle(remainingHTML) {
 	var title = remainingHTML.substring(remainingHTML.indexOf(rightArrow) + rightArrow.length, remainingHTML.indexOf(closeA));
 		// Push to array
 	top250.push(title);
-	console.log(i + ": " + title);
 		// ...aaaand recur
 	i++;
 	if (i>250) { return }
@@ -40,25 +38,24 @@ function findNextTitle(remainingHTML) {
 
 function purge() {
 	var movies = document.getElementsByClassName('agMovie');
-	console.log(movies);
 
 	var length = movies.length;
 	var j = 0;
 	for (k=0; k<length; k++) {
 		var thisMovie = movies[j].getElementsByTagName("img")[0].alt;
 		if (!inTop250(thisMovie)) {
-			console.log("it's not! Removing " + thisMovie)
+			//console.log("it's not! Removing " + thisMovie)
 			movies[j].parentNode.removeChild(movies[j]);
 		}
 		else {
-			console.log(thisMovie + " is in the top 250. Keeping it.");
+			//console.log(thisMovie + " is in the top 250. Keeping it.");
 			j++;
 		}
 	}
+	removeEmptyRows();
 }
 
 function inTop250(movieToCheck) {
-	console.log("checking whether " + movieToCheck + " is in top 250");
 	// look to replace this with a built in function such as array.contains or similar - may increase speed
 	for (var m=0; m<top250.length; m++) {
 		if (movieToCheck == top250[m]) {
@@ -66,6 +63,30 @@ function inTop250(movieToCheck) {
 		}
 	}
 	return false;
+}
+
+function removeEmptyRows() {
+	var rows = document.getElementsByClassName("mrow");
+	var length = rows.length;
+	var j = 0;
+	for(k=0; k<length; k++) {
+		if(rows[j].getElementsByTagName('img').length == 0) {
+			rows[j].parentNode.removeChild(rows[j]);
+		}
+		else if(rows[j].children.length==3) { //deals with rows that are empty && "based on your interest in... <img>":
+			if(rows[j].getElementsByClassName("evidence hasvids").length != 0) {
+				rows[j].parentNode.removeChild(rows[j]);
+			}
+			else {
+				console.log(rows[j].getElementsByTagName('a')[0].innerHTML);
+				j++;
+			}
+		}
+		else {
+			console.log(rows[j].getElementsByTagName('a')[0].innerHTML);
+			j++;
+		}
+	}
 }
 
 
