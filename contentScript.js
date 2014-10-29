@@ -19,6 +19,8 @@ function displayResponse(e) {
   i = 1;
   findNextTitle(responseText);
   purge();
+  showImages();
+	//finish loading animation
 }
 
 function findNextTitle(remainingHTML) { // this is rapid
@@ -34,7 +36,6 @@ function findNextTitle(remainingHTML) { // this is rapid
 	i++;
 	if (i>250) { return }
 	findNextTitle(remainingHTML);
-	showImages();
 }
 
 function purge() { // this is slow (4s)

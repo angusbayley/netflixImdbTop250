@@ -26,4 +26,25 @@ chrome.runtime.onInstalled.addListener(function() {
 chrome.pageAction.onClicked.addListener(function() {
   console.log("clicked!");
   chrome.tabs.executeScript({file: "contentScript.js"});
+  startLoad();
 });
+
+function startLoad() {
+  // var canvas = document.getElementById('canvas');
+  // var ctx = canvas.getContext('2d');
+  console.log("startLoad working");
+  var cl = new CanvasLoader('canvas');
+  cl.setDiameter(30); // default is 40
+  cl.setDensity(42); // default is 40
+  cl.setRange(0.5); // default is 1.3
+  cl.show(); // Hidden by default
+  ctx = document.getElementById('canvas').getContext('2d');
+  var tab = chrome.tabs.query({active: true}, function(tabs) {
+    window.setInterval(function() {
+      console.log("setting icon");  
+      chrome.pageAction.setIcon({imageData: ctx.getImageData(0, 0, 19, 19), tabId: tabs[0].id});
+    }, 50);
+    console.log("icon set");
+  });
+}
+
