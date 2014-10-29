@@ -2,8 +2,7 @@ console.log("contentScript reporting for duty");
 
 var path = "http://www.imdb.com/chart/top";
 
-function getIMDB() { // this is quick enough (probs can't do anything about it anyway)
-	//console.log("request starts at: " + Date.now());
+function getIMDB() {
 	var req = new XMLHttpRequest();
 	req.open('GET', path, true);
 	req.onload = displayResponse;
@@ -11,7 +10,6 @@ function getIMDB() { // this is quick enough (probs can't do anything about it a
 }
 
 function displayResponse(e) {
-	//console.log("displayResponse starts at: " + Date.now());
 	var responseText = e.target.responseText;
   closeSpan = "</span>";
   rightArrow = ">";
@@ -20,7 +18,6 @@ function displayResponse(e) {
   titleColumnText = 'class="titleColumn"';
   i = 1;
   findNextTitle(responseText);
-  //console.log("findNextTitle finishes at: " + Date.now());
   purge();
 }
 
@@ -89,12 +86,10 @@ function removeEmptyRows() {	// this is rapid
 				rows[j].parentNode.removeChild(rows[j]);
 			}
 			else {
-				//console.log(rows[j].getElementsByTagName('a')[0].innerHTML);
 				j++;
 			}
 		}
 		else {
-			//console.log(rows[j].getElementsByTagName('a')[0].innerHTML);
 			j++;
 		}
 	}
