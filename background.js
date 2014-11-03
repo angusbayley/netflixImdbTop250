@@ -33,17 +33,30 @@ function startLoad() {
   // var canvas = document.getElementById('canvas');
   // var ctx = canvas.getContext('2d');
   console.log("startLoad working");
-  var cl = new CanvasLoader('canvas');
-  cl.setDiameter(30); // default is 40
-  cl.setDensity(42); // default is 40
-  cl.setRange(0.5); // default is 1.3
-  cl.show(); // Hidden by default
-  ctx = document.getElementById('canvas').getContext('2d');
+  var canvas = document.getElementById('canvas');
+  var ctx = canvas.getContext('2d');
   var tab = chrome.tabs.query({active: true}, function(tabs) {
+    var positions = [];
+    var resolution = 25;
+    var radius = 6;
+    var thickness = 2;
+    for (var i=0; i<resolution; i++) {
+      var x = canvas.width/2 + radius*Math.sin(2*Math.PI*i/resolution);
+      var y = canvas.height/2 + radius*Math.cos(2*Math.PI*i/resolution);
+      positions[i] = [x,y];
+    }
+    console.log(positions);
+
     window.setInterval(function() {
-      console.log("setting icon");  
+      console.log("setting icon");
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for(var i=0; i<resolution/1.5; i++) {
+        ctx.arc(positions[i][0], positions[i][1], thickness, 0, 2*Math.PI, false)
+        ctx.fillStyle = "rgba(0,200,0,255)";
+        ctx.fill();
+      }
       chrome.pageAction.setIcon({imageData: ctx.getImageData(0, 0, 19, 19), tabId: tabs[0].id});
-    }, 50);
+    }, 500);
     console.log("icon set");
   });
 }
