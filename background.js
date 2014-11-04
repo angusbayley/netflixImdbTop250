@@ -36,6 +36,7 @@ function startLoad() {
   var canvas = document.getElementById('canvas');
   var ctx = canvas.getContext('2d');
   var tab = chrome.tabs.query({active: true}, function(tabs) {
+    var tabId = tabs[0].id;
     var positions = [];
     var resolution = 10;
     var radius = 6;
@@ -45,23 +46,24 @@ function startLoad() {
       var y = canvas.height/2 + radius*Math.cos(2*Math.PI*i/resolution);
       positions[i] = [x,y];
     }
-    console.log(positions);
+    //console.log(positions);
     var darkness = 0;
 
     window.setInterval(function() {
-      console.log("setting icon");
+      console.log("new frame");
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       for(var i=0; i<resolution; i++) {
+        ctx.beginPath();
         ctx.arc(positions[i][0], positions[i][1], thickness, 0, 2*Math.PI, false);
         ctx.closePath();
         ctx.fillStyle = "rgb(" + darkness + "," + darkness + "," + darkness + ")";
         ctx.fill();
-        darkness += 255/(resolution-1);
+        darkness += Math.round(255/(resolution-2));
         if(darkness>255) {darkness = 0}
-        console.log(darkness);
+        console.log("circle " + i + " has darkness " + darkness);
       }
-      chrome.pageAction.setIcon({imageData: ctx.getImageData(0, 0, 19, 19), tabId: tabs[0].id});
-    }, 500);
+      chrome.pageAction.setIcon({imageData: ctx.getImageData(0, 0, 19, 19), tabId: tabId});
+    }, 100);
     console.log("icon set");
   });
 }
