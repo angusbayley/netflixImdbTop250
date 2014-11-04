@@ -37,7 +37,7 @@ function startLoad() {
   var ctx = canvas.getContext('2d');
   var tab = chrome.tabs.query({active: true}, function(tabs) {
     var positions = [];
-    var resolution = 25;
+    var resolution = 10;
     var radius = 6;
     var thickness = 2;
     for (var i=0; i<resolution; i++) {
@@ -46,14 +46,19 @@ function startLoad() {
       positions[i] = [x,y];
     }
     console.log(positions);
+    var darkness = 0;
 
     window.setInterval(function() {
       console.log("setting icon");
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      for(var i=0; i<resolution/1.5; i++) {
-        ctx.arc(positions[i][0], positions[i][1], thickness, 0, 2*Math.PI, false)
-        ctx.fillStyle = "rgba(0,200,0,255)";
+      for(var i=0; i<resolution; i++) {
+        ctx.arc(positions[i][0], positions[i][1], thickness, 0, 2*Math.PI, false);
+        ctx.closePath();
+        ctx.fillStyle = "rgb(" + darkness + "," + darkness + "," + darkness + ")";
         ctx.fill();
+        darkness += 255/(resolution-1);
+        if(darkness>255) {darkness = 0}
+        console.log(darkness);
       }
       chrome.pageAction.setIcon({imageData: ctx.getImageData(0, 0, 19, 19), tabId: tabs[0].id});
     }, 500);
