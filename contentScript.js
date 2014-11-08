@@ -3,7 +3,7 @@ console.log("contentScript reporting for duty");
 var path = "http://www.imdb.com/chart/top";
 
 function getIMDB() { // this is quick enough (probs can't do anything about it anyway)
-	//console.log("request starts at: " + Date.now());
+	console.log("request starts at: " + Date.now());
 	var req = new XMLHttpRequest();
 	req.open('GET', path, true);
 	req.onload = displayResponse;
@@ -11,7 +11,7 @@ function getIMDB() { // this is quick enough (probs can't do anything about it a
 }
 
 function displayResponse(e) {
-	//console.log("displayResponse starts at: " + Date.now());
+	console.log("displayResponse starts at: " + Date.now());
 	var responseText = e.target.responseText;
   closeSpan = "</span>";
   rightArrow = ">";
@@ -111,9 +111,10 @@ function showImages() {
 	}
 }
 
-if (document.readyState == "complete") {
+if (document.readyState != "loading") {
 	getIMDB();
 }
 else {
+	console.log(Date.now());
 	document.addEventListener('DOMContentLoaded', getIMDB);
 }
