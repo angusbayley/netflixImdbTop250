@@ -18,13 +18,13 @@ function displayResponse(e) {
   closeA = "</a>";
   top250 = [];
   titleColumnText = 'class="titleColumn"';
-  i = 1;
-  findNextTitle(responseText);
+  var i = 1;
+  findNextTitle(responseText, i);
   //console.log("findNextTitle finishes at: " + Date.now());
   purge();
 }
 
-function findNextTitle(remainingHTML) { // this is rapid
+function findNextTitle(remainingHTML, i) { // this is rapid
 		// Get to end of start of next .titleColumn <td>
 	remainingHTML = remainingHTML.slice(remainingHTML.indexOf(titleColumnText) + titleColumnText.length);
 		// Get to end of next </span>
@@ -36,31 +36,52 @@ function findNextTitle(remainingHTML) { // this is rapid
 		// ...aaaand recur
 	i++;
 	if (i>250) { return }
-	findNextTitle(remainingHTML);
-	showImages();
+	findNextTitle(remainingHTML, i);
+	//showImages();
 }
 
-function purge() { // this is slow (4s)
+function purge() {
 	//console.log("purge starts at: " + Date.now());
-	var movies = document.getElementsByClassName('agMovie');
+	var rows = document.getElementsByClassName("mrow");
+	var rowSchedule = rowScheduler(rows);
+	for (var i=0; i<rowSchedule.length; i++) {
+		var row = rows[rowSchedule[i]];
+		//filterRow(row);
+	}
+	//removeEmptyRows();
+}
+
+function rowScheduler(rows) {
+
+	// Prioritisation should happen by deleting all rows in view then deleting the one above then the one
+	// below then above then below etc. If the next above/below is the last before the start/end of the
+	// page then the prioritiser should deal with that row then only go in the opposite direction
+	// thereafter. The prioritiser should output an array of indeces that correspond to rows, then a
+	// function for filtering out a single row should iteratively take each element of the array, use it
+	// to locate the row, and filter that row.
+
+	var countRows = rows.length;
+	for (var i=0; i<countRows; i++) {
+		console.log(Date.now());
+		console.log("client top clearance: " + rows[i].getBoundingClientRect().top);
+	}
+}
+
+function filterRow(row) {
+	var movies = row.getElementsByClassName('agMovie');
 	var length = movies.length;
 	var j = 0;
 	for (k=0; k<length; k++) {
 		//console.log("purge iteration starts at: " + Date.now());
 		var thisMovie = movies[j].getElementsByTagName("img")[0].alt;
 		if (!inTop250(thisMovie)) {
-			//console.log("it's not! Removing " + thisMovie)
 			movies[j].parentNode.removeChild(movies[j]);	// 	*** this is the slow line ***
 			//console.log("not in top 250 block ends at: " + Date.now());
 		}
 		else {
-			//console.log(thisMovie + " is in the top 250. Keeping it.");
 			j++;
 		}
 	}
-	//console.log("purge for loop finishes at: " + Date.now());
-	removeEmptyRows();
-	//console.log("removeEmptyRows finishes at: " + Date.now());
 }
 
 function inTop250(movieToCheck) { // slow but not the slowest part (accounts for ~1/4 of the time)
