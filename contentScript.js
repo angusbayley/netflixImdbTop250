@@ -20,7 +20,7 @@ function parseAndPurge(e) {
   titleColumnText = 'class="titleColumn"';
   var i = 1;
   findNextTitle(responseText, i);
-  //console.log("findNextTitle finishes at: " + Date.now());
+  console.log("findNextTitle finishes at: " + Date.now());
   purge();
 }
 
@@ -46,89 +46,49 @@ function purge() {
 	console.log("purge finishes at: " + Date.now());
 }
 
+// Prioritisation should happen by deleting all rows in view then sequentially deleting the ones
+// below one by one until the end. removeRowIfEmpty() is built into this, and if the row is removed
+// the same row should be processed next (because the rows are in a nodelist, not an array).
+
+
 function rowScheduler(rows) {
-
-	// Prioritisation should happen by deleting all rows in view then deleting the one above then the one
-	// below then above then below etc. If the next above/below is the last before the start/end of the
-	// page then the prioritiser should deal with that row then only go in the opposite direction
-	// thereafter. The prioritiser should output an array of indeces that correspond to rows, then a
-	// function for filtering out a single row should iteratively take each element of the array, use it
-	// to locate the row, and filter that row.
-
+	window.scrollTo(0,0);										// scrolls to top of page
 	var countRows = rows.length;
-
+	console.log(countRows);
 	var firstRowTopDiff = rows[0].getBoundingClientRect().top;
-	if(firstRowTopDiff>0) {
-		var j = 0;
-		for (var i=0; i<countRows; i++) {
-			filterRow(rows[j]);
-			showImages(rows[j]);
-			if (!removeRowIfEmpty(rows[j])) { j++ }		// evaluates false if row removed
-		}
-	}
-	else {
-		for (var i=1; i<countRows; i++) {
-			var topDiff = rows[i].getBoundingClientRect().top;
-			if (topDiff>0) {														// i now represents the first fully visible row
-				break;
-			}
-		}
-		processRow(rows, i-1);										// first row gets processed
-		processRow(rows, i);
-		if (rows[i+1]) {processRow(rows, i+1);}
-		if (rows[i+2]) {processRow(rows, i+2);}		// all rows in view at normal zoom are now processed
-
-//now, process the next row down then next row up, then down then up until all rows done:
-		
-		window.setTimeout(function() {cleanSurroundingRows(i, 2, rows)}, 1000);
-	}
+	if(firstRowTopDiff>0) {									// always true if scrolling to top works
+		var i = 0;
+		processRow(rows, i); i ++;						// first row gets processed
+		processRow(rows, i); i ++;						// all rows in view at normal zoom are now processed
+		console.log("Visible rows deleted at " + Date.now())
+		processRemainingRows(rows, i);		// all remaining rows are asynchronously removed one by one
+	}		
 }
 
-function cleanSurroundingRows(i, j, rows) {
-	console.log("cleaning... j = " + j);
-	if (rows[i+j]) {									// checks row exists first
-		processRow(rows, (i+j));	
-	}
-	if (rows[i-j]) {									// checks row exists first
-		console.log("i: "+i);
-		rowsAboveRemoved = 0;
-		processRow(rows, (i-j), true);
-		i -= rowsAboveRemoved;
-		//console.log("shifted i: "+i);
-	}
-	console.log("function's i, j: " + i + ", " + j);
-	if (j>rows.length) {
-		return ;
-	}
-
-	window.setTimeout(function() {
-		console.log("callback's i, j: " + i + ", " + j);
-		cleanSurroundingRows(i,j+1,rows);
-	}, 100);
-}
-
-
-function processRow(rows, index, above) {	// reason for taking these arguments: see below
-	filterRow(rows[index]);
-	showImages(rows[index]);
-	if (removeRowIfEmpty(rows[index])) {							// evaluates true if row was removed
-
-		if (above) {
-			rowsAboveRemoved++;
-			index --;
-			//console.log("rowsAboveRemoved is working");
-			if (rows[index]) {															// rows is a node list so rows[index] has a different meaning now
-				processRow(rows, index, true);	// processes the row that replaced the old one
+function processRow(rows, index) {				// reason for taking these arguments: see below
+	if (rows[index]) {											// only preceed if the row exists
+		filter(rows[index]);
+		showImages(rows[index]);
+		if (removeRowIfEmpty(rows[index])) {	// evaluates true if row was removed
+			if (rows[index]) {									// rows is a node list so rows[index] has a different meaning now
+				processRow(rows, index);					// processes the row that replaced the old one
 			}
-		}
-
-		else if (rows[index]) {															// rows is a node list so rows[index] has a different meaning now
-			processRow(rows, index, false);	// processes the row that replaced the old one
 		}
 	}
 } 
 
-function filterRow(row) {
+function processRemainingRows(rows, index) {
+	processRow(rows, index); index++;
+	console.log("callback i = " + index );
+	if (index>rows.length) {
+		return
+	}
+	window.setTimeout(function() {
+		processRemainingRows(rows, index);
+	}, 300);
+}
+
+function filter(row) {
 	var movies = row.getElementsByClassName('agMovie');
 	var length = movies.length;
 	var j = 0;
