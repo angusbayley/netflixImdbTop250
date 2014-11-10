@@ -50,20 +50,21 @@ function startLoad() {
     var darkness = 0;
 
     window.setInterval(function() {
-      console.log("new frame");
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       for(var i=0; i<resolution; i++) {
+        darkness += (255/resolution);
+        if(darkness>255) {darkness -= 255}
+        var roundedDarkness = Math.round(darkness);
         ctx.beginPath();
         ctx.arc(positions[i][0], positions[i][1], thickness, 0, 2*Math.PI, false);
         ctx.closePath();
-        ctx.fillStyle = "rgb(" + darkness + "," + darkness + "," + darkness + ")";
+        ctx.fillStyle = "rgb(" + roundedDarkness + "," + roundedDarkness + "," + roundedDarkness + ")";
         ctx.fill();
-        darkness += Math.round(255/(resolution-2));
-        if(darkness>255) {darkness = 0}
         console.log("circle " + i + " has darkness " + darkness);
       }
+      darkness += (255/resolution);
       chrome.pageAction.setIcon({imageData: ctx.getImageData(0, 0, 19, 19), tabId: tabId});
-    }, 100);
+    }, 250);
     console.log("icon set");
   });
 }
