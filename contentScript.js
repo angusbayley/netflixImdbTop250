@@ -1,5 +1,3 @@
-console.log("contentScript reporting for duty");
-
 var path = "http://www.imdb.com/chart/top";
 
 function getIMDB() { // this is quick enough (probs can't do anything about it anyway)
@@ -22,8 +20,6 @@ function parseAndPurge(e) {
   findNextTitle(responseText, i);
   console.log("findNextTitle finishes at: " + Date.now());
   purge();
-  showImages();
-	//finish loading animation
 }
 
 function findNextTitle(remainingHTML, i) { // this is rapid
@@ -63,7 +59,7 @@ function rowScheduler(rows) {
 		processRow(rows, i); i ++;						// first row gets processed
 		processRow(rows, i); i ++;						// all rows in view at normal zoom are now processed
 		console.log("Visible rows deleted at " + Date.now())
-		processRemainingRows(rows, i);		// all remaining rows are asynchronously removed one by one
+		processRemainingRows(rows, i);				// all remaining rows are asynchronously removed one by one
 	}		
 }
 
@@ -83,6 +79,8 @@ function processRemainingRows(rows, index) {
 	processRow(rows, index); index++;
 	console.log("callback i = " + index );
 	if (index>rows.length) {
+		chrome.extension.sendMessage("done");
+		console.log("contentScript says 'done'");
 		return
 	}
 	window.setTimeout(function() {

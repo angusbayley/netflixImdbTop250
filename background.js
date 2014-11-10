@@ -21,18 +21,13 @@ chrome.runtime.onInstalled.addListener(function() {
   });
 });
 
-//console.log("backgound.js checking in");
-
 chrome.pageAction.onClicked.addListener(function() {
-  console.log("clicked!");
   chrome.tabs.executeScript({file: "contentScript.js"});
   startLoad();
 });
 
 function startLoad() {
-  // var canvas = document.getElementById('canvas');
-  // var ctx = canvas.getContext('2d');
-  console.log("startLoad working");
+  window.progress = "";
   var canvas = document.getElementById('canvas');
   var ctx = canvas.getContext('2d');
   var tab = chrome.tabs.query({active: true}, function(tabs) {
@@ -46,10 +41,12 @@ function startLoad() {
       var y = canvas.height/2 + radius*Math.cos(2*Math.PI*i/resolution);
       positions[i] = [x,y];
     }
-    //console.log(positions);
     var darkness = 0;
 
     window.setInterval(function() {
+      if (window.progress == "done") {
+        return
+      }
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       for(var i=0; i<resolution; i++) {
         darkness += (255/resolution);
@@ -60,12 +57,19 @@ function startLoad() {
         ctx.closePath();
         ctx.fillStyle = "rgb(" + roundedDarkness + "," + roundedDarkness + "," + roundedDarkness + ")";
         ctx.fill();
-        console.log("circle " + i + " has darkness " + darkness);
       }
       darkness += (255/resolution);
       chrome.pageAction.setIcon({imageData: ctx.getImageData(0, 0, 19, 19), tabId: tabId});
     }, 250);
-    console.log("icon set");
   });
 }
 
+chrome.extension.onMessage.addListener(function(status, sender) {
+  if (status=="done") {
+    window.progress = "done";
+    chrome.pageAction.setIcon({
+      path: 'icon.png',
+      tabId: sender.tab.id
+    });
+  }
+});
