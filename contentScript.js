@@ -10,6 +10,7 @@ function getIMDB() { // this is quick enough (probs can't do anything about it a
 
 function parseAndPurge(e) {
 	console.log("onload at: " + Date.now());
+	var exceptions = ["The Killing"];
 	var responseText = e.target.responseText;
   closeSpan = "</span>";
   rightArrow = ">";
@@ -18,6 +19,7 @@ function parseAndPurge(e) {
   titleColumnText = 'class="titleColumn"';
   var i = 1;
   findNextTitle(responseText, i);
+  top250 = cleanseTop250(top250, exceptions);
   console.log("findNextTitle finishes at: " + Date.now());
   purge();
 }
@@ -35,6 +37,13 @@ function findNextTitle(remainingHTML, i) { // this is rapid
 	i++;
 	if (i>250) { return }
 	findNextTitle(remainingHTML, i);
+}
+
+function cleanseTop250(top250, exceptions) {
+	for (var i=0; i<exceptions.length; i++) {
+		top250.splice(top250.indexOf(exceptions[i]), 1);
+	}
+	return top250;
 }
 
 function purge() {
