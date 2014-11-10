@@ -22,6 +22,8 @@ function parseAndPurge(e) {
   findNextTitle(responseText, i);
   console.log("findNextTitle finishes at: " + Date.now());
   purge();
+  showImages();
+	//finish loading animation
 }
 
 function findNextTitle(remainingHTML, i) { // this is rapid
