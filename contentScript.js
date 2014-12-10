@@ -1,9 +1,10 @@
-var path = "http://www.imdb.com/chart/top";
+var IMDbTop250Path = "http://www.imdb.com/chart/top";
+var RTTop100Path = "http://www.rottentomatoes.com/top/bestofrt";
 
 function getIMDB() { // this is quick enough (probs can't do anything about it anyway)
 	console.log("request starts at: " + Date.now());
 	var req = new XMLHttpRequest();
-	req.open('GET', path, true);
+	req.open('GET', IMDbTop250Path, true);
 	req.onload = parseAndPurge;
 	req.send(null);
 }
@@ -151,10 +152,14 @@ function showImages(row) {
 	}
 }
 
-if (document.readyState != "loading") {
-	getIMDB();
+function addButtons() {
+    $("#global-header").append( '<li id="IMDb-top-250" class="nav-item"><a>IMDb top 250</a></li><li id="RT-top-100" class="nav-item">RT top 100</li>' ); 
 }
-else {
-	console.log(Date.now());
-	document.addEventListener('DOMContentLoaded', getIMDB);
-}
+
+console.log("new script 2");
+$(document).ready(function() {
+	addButtons();
+	$('#IMDb-top-250').click(getIMDB);
+	$('#RT-top-100').click(getIMDB);
+});
+
